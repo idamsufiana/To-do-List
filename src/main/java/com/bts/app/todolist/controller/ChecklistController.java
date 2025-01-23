@@ -7,12 +7,16 @@ import com.bts.app.todolist.model.CheckList;
 import com.bts.app.todolist.model.Item;
 import com.bts.app.todolist.service.ChecklistService;
 import com.bts.app.todolist.service.ItemService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -61,4 +65,37 @@ public class ChecklistController extends BaseController{
         Pageable pageable = this.pageFromRequest(page, limit, sort, asc);
         return this.success(this.checklistService.findAll(pageable));
     }
+
+    @DeleteMapping("/{checklistId}/items/{itemId}")
+    public ResponseEntity<?> deleteItemFromChecklist(
+            @PathVariable Long checklistId,
+            @PathVariable Long itemId) {
+        try {
+            checklistService.deleteItem(checklistId, itemId);
+            return ResponseEntity.ok().body(Collections.singletonMap("message", "Item deleted successfully"));
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.singletonMap("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("error", "An error occurred"));
+        }
+    }
+
+    @PatchMapping("/{checklistId}/items/{itemId}/status")
+    public ResponseEntity<?> updateItemStatus(
+            @PathVariable Long checklistId,
+            @PathVariable Long itemId,
+            @RequestBody Map<String, String> request) {
+        try {
+            String status = request.get("status");
+            Item updatedItem = checklistService.updateItemStatus(checklistId, itemId, status);
+            return ResponseEntity.ok().body(updatedItem);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.singletonMap("error", e.getMessage()));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("error", "An error occurred"));
+        }
+    }
+
 }

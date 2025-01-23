@@ -7,6 +7,7 @@ import com.bts.app.todolist.model.CheckList;
 import com.bts.app.todolist.model.Item;
 import com.bts.app.todolist.repository.ChecklistRepository;
 import com.bts.app.todolist.repository.ItemRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Optional;
 
@@ -22,6 +24,9 @@ public class ChecklistService {
 
     @Autowired
     ChecklistRepository checklistRepository;
+
+    @Autowired
+    ItemRepository itemRepository;
 
     public CheckList createFromDto(CheckListDto dto) throws Throwable {
         try {
@@ -85,5 +90,29 @@ public class ChecklistService {
         } catch (Throwable var4) {
             throw var4;
         }
+    }
+    public void deleteItem(Long checklistId, Long itemId) throws EntityNotFoundException {
+        CheckList checklist = checklistRepository.findById(checklistId)
+                .orElseThrow(() -> new EntityNotFoundException("Checklist not found"));
+        Item item = itemRepository.findByIdAndChecklist(itemId, checklist)
+                .orElseThrow(() -> new EntityNotFoundException("Item not found in checklist"));
+        itemRepository.delete(item);
+    }
+
+    public Item updateItemStatus(Long checklistId, Long itemId, String status) throws EntityNotFoundException, IllegalArgumentException {
+        if (!"completed".equalsIgnoreCase(status)) {
+            throw new IllegalArgumentException("Invalid status value. Allowed values are: 'completed'");
+        }
+
+        CheckList checklist = checklistRepository.findById(checklistId)
+                .orElseThrow(() -> new EntityNotFoundException("Checklist not found"));
+
+        Item item = itemRepository.findByIdAndChecklist(itemId, checklist)
+                .orElseThrow(() -> new EntityNotFoundException("Item not found in checklist"));
+
+        item.setCompleted(true);
+        item.setUpdatedDate(new Date());
+
+        return itemRepository.save(item);
     }
 }
