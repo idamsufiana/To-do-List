@@ -74,9 +74,9 @@ public class ChecklistController extends BaseController{
             checklistService.deleteItem(checklistId, itemId);
             return ResponseEntity.ok().body(Collections.singletonMap("message", "Item deleted successfully"));
         } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.singletonMap("error", e.getMessage()));
+            return error(HttpStatus.NOT_FOUND, e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("error", "An error occurred"));
+            return error(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 
@@ -84,17 +84,16 @@ public class ChecklistController extends BaseController{
     public ResponseEntity<?> updateItemStatus(
             @PathVariable Long checklistId,
             @PathVariable Long itemId,
-            @RequestBody Map<String, String> request) {
+            @RequestBody String status) {
         try {
-            String status = request.get("status");
             Item updatedItem = checklistService.updateItemStatus(checklistId, itemId, status);
             return ResponseEntity.ok().body(updatedItem);
         } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.singletonMap("error", e.getMessage()));
+            return error(HttpStatus.NOT_FOUND, e.getMessage());
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("error", e.getMessage()));
+            return error(HttpStatus.BAD_REQUEST, e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("error", "An error occurred"));
+            return error(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 
