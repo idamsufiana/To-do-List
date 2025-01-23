@@ -66,6 +66,7 @@ public class ChecklistController extends BaseController{
         return this.success(this.checklistService.findAll(pageable));
     }
 
+    @PreAuthorize("hasRole('USER','ADMIN')")
     @DeleteMapping("/{checklistId}/items/{itemId}")
     public ResponseEntity<?> deleteItemFromChecklist(
             @PathVariable Long checklistId,
@@ -80,6 +81,7 @@ public class ChecklistController extends BaseController{
         }
     }
 
+    @PreAuthorize("hasRole('USER','ADMIN')")
     @PatchMapping("/{checklistId}/items/{itemId}/status")
     public ResponseEntity<?> updateItemStatus(
             @PathVariable Long checklistId,

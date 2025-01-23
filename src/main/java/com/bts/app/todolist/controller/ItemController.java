@@ -5,6 +5,8 @@ import com.bts.app.todolist.exception.BTSException;
 import com.bts.app.todolist.model.Item;
 import com.bts.app.todolist.service.ItemService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,5 +49,14 @@ public class ItemController extends BaseController{
     public Object add(@PathVariable Long id) throws Throwable {
         return success(itemService.delete(id));
     }
+
+    @PreAuthorize("hasRole('USER','ADMIN')")
+    @PostMapping("/{checklistId}/add")
+    public ResponseEntity<?> createChecklistItem(@PathVariable Long checklistId,
+                                                 @RequestBody ItemDto itemDto) throws Throwable {
+        return success(itemService.createItem(checklistId, itemDto));
+
+    }
+
 }
 
