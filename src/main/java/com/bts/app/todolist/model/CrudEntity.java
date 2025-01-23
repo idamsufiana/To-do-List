@@ -1,6 +1,7 @@
 package com.bts.app.todolist.model;
 
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 
@@ -10,7 +11,7 @@ import java.util.Date;
 @MappedSuperclass
 public abstract class CrudEntity implements Serializable {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long id;
     protected Date createdDate;
     protected Date updatedDate;

@@ -1,5 +1,6 @@
 package com.bts.app.todolist.service;
 
+import com.bts.app.todolist.dto.CheckListDto;
 import com.bts.app.todolist.dto.ItemDto;
 import com.bts.app.todolist.exception.BTSException;
 import com.bts.app.todolist.model.CheckList;
@@ -19,7 +20,7 @@ public class ChecklistService {
     @Autowired
     ChecklistRepository checklistRepository;
 
-    public CheckList createFromDto(ItemDto dto) throws Throwable {
+    public CheckList createFromDto(CheckListDto dto) throws Throwable {
         try {
             CheckList entity = new CheckList();
             BeanUtils.copyProperties(dto, entity);
@@ -41,7 +42,7 @@ public class ChecklistService {
         }
     }
 
-    public CheckList update(Long id, ItemDto dto) throws Throwable {
+    public CheckList update(Long id, CheckListDto dto) throws Throwable {
         try {
             CheckList entity = new CheckList();
             if(get(id).isPresent()){
